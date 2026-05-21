@@ -39,7 +39,6 @@
     letter-spacing: 0.5px;
     padding: 8px 12px;
     background: rgba(5, 8, 14, 0.75);
-    border: 1px solid rgba(120, 150, 180, 0.25);
     border-radius: 4px;
     text-shadow: 0 0 6px rgba(5, 8, 14, 0.9);
     word-break: break-word;
@@ -63,7 +62,6 @@
     width: auto;
     height: auto;
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(120, 150, 180, 0.3);
     pointer-events: auto;
   }
 </style>
@@ -79,11 +77,11 @@
 
   <!-- Centered image -->
   <div id="center-image-wrap">
-    <img id="center-image" src="ancienttext.jpeg" alt="Ancient text" />
+    <img id="center-image" src="ancienttext.jpg" alt="Ancient text" />
   </div>
 
 <script>
-// ============ MATRIX RAIN (PAUSED) ============
+// ============ MATRIX RAIN ============
 (function(){
   var rc = document.getElementById('rain-canvas');
   var rctx = rc.getContext('2d');
@@ -91,7 +89,6 @@
   var fontSize = 16;
   var columns, drops;
   var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*+-=[]{}|;:<>?/!～！￥（）【】';
-
   function sizeRain() {
     rc.width  = window.innerWidth  * dpr;
     rc.height = window.innerHeight * dpr;
@@ -101,39 +98,34 @@
     rctx.scale(dpr, dpr);
     columns = Math.floor(window.innerWidth / fontSize);
     drops = [];
-    // Spread the static frame across the whole screen so we get
-    // a full field of characters instead of one starting row.
-    for (var i = 0; i < columns; i++) {
-      drops[i] = Math.random() * (window.innerHeight / fontSize);
-    }
-    drawStaticFrame();
+    for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
   }
-
-  // Draw ONE frame, then stop. No requestAnimationFrame loop = paused.
-  function drawStaticFrame() {
-    // Solid background so we start clean on resize
-    rctx.fillStyle = '#05080e';
-    rctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    rctx.font = fontSize + 'px monospace';
-
-    for (var i = 0; i < drops.length; i++) {
-      var x = i * fontSize;
-      var y = drops[i] * fontSize;
-
-      // tail
-      var tail = chars.charAt(Math.floor(Math.random() * chars.length));
-      rctx.fillStyle = 'rgba(120, 150, 180, 0.45)';
-      rctx.fillText(tail, x, y - fontSize);
-
-      // head
-      var text = chars.charAt(Math.floor(Math.random() * chars.length));
-      rctx.fillStyle = 'rgba(200, 220, 240, 0.85)';
-      rctx.fillText(text, x, y);
-    }
-  }
-
   sizeRain();
   window.addEventListener('resize', sizeRain);
+  var lastDraw = 0;
+  function drawRain(ts) {
+    if (ts - lastDraw < 50) { requestAnimationFrame(drawRain); return; }
+    lastDraw = ts;
+    rctx.fillStyle = 'rgba(5, 8, 14, 0.10)';
+    rctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    rctx.font = fontSize + 'px monospace';
+    for (var i = 0; i < drops.length; i++) {
+      var text = chars.charAt(Math.floor(Math.random() * chars.length));
+      var x = i * fontSize;
+      var y = drops[i] * fontSize;
+      rctx.fillStyle = 'rgba(200, 220, 240, 0.85)';
+      rctx.fillText(text, x, y);
+      if (drops[i] > 1) {
+        var tail = chars.charAt(Math.floor(Math.random() * chars.length));
+        rctx.fillStyle = 'rgba(120, 150, 180, 0.45)';
+        rctx.fillText(tail, x, y - fontSize);
+      }
+      if (y > window.innerHeight && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+    requestAnimationFrame(drawRain);
+  }
+  requestAnimationFrame(drawRain);
 })();
 </script>
 
