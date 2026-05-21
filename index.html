@@ -8,13 +8,17 @@
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
     background: #05080e;
-    overflow: hidden;
     font-family: monospace;
   }
 
-  /* Matrix rain canvas sits behind everything */
+  /* Make the page scrollable. Adjust this number to control
+     how much you can scroll: 300vh = ~3 screens of scroll room. */
+  body {
+    min-height: 300vh;
+  }
+
+  /* Matrix rain canvas stays fixed in the background */
   #rain-canvas {
     position: fixed;
     inset: 0;
@@ -23,9 +27,8 @@
   }
 
   /* Editable horizontal text in top-left.
-     Add more text inside the <div id="top-text"> block below.
-     The semi-transparent panel + text shadow keeps it readable
-     over the rain without changing its color/size. */
+     Stays fixed in the top-left corner even when scrolling.
+     Add more text inside the <div id="top-text"> block below. */
   #top-text {
     position: fixed;
     top: 16px;
@@ -37,21 +40,24 @@
     font-size: 16px;
     line-height: 1.4;
     letter-spacing: 0.5px;
-    padding: 8px 12px;
-    background: rgba(5, 8, 14, 0.75);
-    border-radius: 4px;
     word-break: break-word;
     white-space: normal;
   }
 
-  /* Centered image, not full screen */
+  /* Image wrapper: takes up the full first screen,
+     image is anchored to its bottom edge so on load you see
+     the image at the bottom of the viewport. As you scroll down,
+     the image scrolls up past the (fixed) rain background. */
   #center-image-wrap {
-    position: fixed;
-    inset: 0;
+    position: relative;
     z-index: 1;
+    width: 100%;
+    height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
+    padding-bottom: 16px;
+    box-sizing: border-box;
     pointer-events: none;
   }
 
@@ -60,22 +66,31 @@
     max-height: 47vh;
     width: auto;
     height: auto;
-    opacity: 0.67;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+    opacity: 0.48;
     pointer-events: auto;
+  }
+
+  /* On narrow screens (mobile), let the image be wider since
+     37vw is too small on a phone. */
+  @media (max-width: 700px) {
+    #center-image {
+      max-width: 70vw;
+      max-height: 47vh;
+    }
   }
 </style>
 </head>
 <body>
 
-  <!-- Matrix rain background (paused) -->
+  <!-- Matrix rain background (animated, fixed) -->
   <canvas id="rain-canvas"></canvas>
 
   <!-- TOP-LEFT HORIZONTAL TEXT
        Edit / append more text directly inside this div. -->
-  <div id="top-text">ENTERTEXTHEREENTERTEXTHEREENTERTEXTHEREentertexthereEthertexthereBaseballistheGreatestGame</div>
+  <div id="top-text">ENTERTEXTHEREENTERTEXTHEREENTERTEXTHEREentertexthereEthertexthere</div>
 
-  <!-- Centered image -->
+  <!-- Image sits at the bottom of the first screen.
+       Scroll down to make it appear to move up past the rain. -->
   <div id="center-image-wrap">
     <img id="center-image" src="ancienttext.jpg" alt="Ancient text" />
   </div>
